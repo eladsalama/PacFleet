@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<!--
+  PacFleet collector robot description (chomp / dash / nibble).
+
+  One parameterized macro, instanced per robot from the launch file:
+    xacro ugv.urdf.xacro prefix:=chomp/ color:="1.0 0.9 0.1"
+
+  Frame names are prefixed HERE in the xacro (e.g. chomp/base_link) rather than
+  relying on robot_state_publisher's frame_prefix, so the tf tree is fully
+  deterministic per namespace. Joint names are prefixed the same way and the
+  simulator publishes matching joint_states.
+
+  Every dimension is multiplied by `s` so the whole robot scales uniformly —
+  big enough to read clearly on the arcade board.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="ugv">
+
+  <xacro:arg name="prefix" default=""/>
+  <xacro:arg name="color_r" default="0.35"/>
+  <xacro:arg name="color_g" default="0.38"/>
+  <xacro:arg name="color_b" default="0.30"/>
+
+  <xacro:property name="s" value="2.2"/>   <!-- global visual scale -->
+
+  <material name="body_color">
+    <color rgba="$(arg color_r) $(arg color_g) $(arg color_b) 1.0"/>
+  </material>
+  <material name="dark">
+    <color rgba="0.12 0.12 0.12 1.0"/>
+  </material>
+  <material name="sensor_glass">
+    <color rgba="0.1 0.2 0.25 1.0"/>
+  </material>
+
+  <xacro:macro name="boxi" params="m x y z">
+    <inertial>
+      <mass value="${m}"/>
+      <inertia ixx="${m*(y*y+z*z)/12}" iyy="${m*(x*x+z*z)/12}" izz="${m*(x*x+y*y)/12}"
+               ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </xacro:macro>
+
+  <!-- ================= base ================= -->
+  <link name="$(arg prefix)base_link">
+    <visual>
+      <origin xyz="0 0 ${0.14*s}"/>
+      <geometry><box size="${0.52*s} ${0.36*s} ${0.14*s}"/></geometry>
+      <material name="body_color"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${0.14*s}"/>
+      <geometry><box size="${0.52*s} ${0.36*s} ${0.14*s}"/></geometry>
+    </collision>
+    <!-- no inertial on the root link: KDL (robot_state_publisher) rejects it -->
+  </link>
+
+  <!-- flipper-style side skirts -->
+  <link name="$(arg prefix)skirt_left">
+    <visual>
+      <geometry><box size="${0.44*s} ${0.03*s} ${0.10*s}"/></geometry>
+      <material name="dark"/>
+    </visual>
+    <xacro:boxi m="1.0" x="${0.44*s}" y="${0.03*s}" z="${0.10*s}"/>
+  </link>
+  <joint name="$(arg prefix)skirt_left_joint" type="fixed">
+    <parent link="$(arg prefix)base_link"/>
+    <child link="$(arg prefix)skirt_left"/>
+    <origin xyz="0 ${0.21*s} ${0.10*s}"/>
+  </joint>
+
+  <link name="$(arg prefix)skirt_right">
+    <visual>
+      <geometry><box size="${0.44*s} ${0.03*s} ${0.10*s}"/></geometry>
+      <material name="dark"/>
+    </visual>
+    <xacro:boxi m="1.0" x="${0.44*s}" y="${0.03*s}" z="${0.10*s}"/>
+  </link>
+  <joint name="$(arg prefix)skirt_right_joint" type="fixed">
+    <parent link="$(arg prefix)base_link"/>
+    <child link="$(arg prefix)skirt_right"/>
+    <origin xyz="0 ${-0.21*s} ${0.10*s}"/>
+  </joint>
+
+  <!-- ================= driven wheels (diff drive) ================= -->
+  <xacro:macro name="wheel" params="side y">
+    <link name="$(arg prefix)wheel_${side}">
+      <visual>
+        <origin rpy="${pi/2} 0 0"/>
+        <geometry><cylinder radius="${0.09*s}" length="${0.06*s}"/></geometry>
+        <material name="dark"/>
+      </visual>
+      <collision>
+        <origin rpy="${pi/2} 0 0"/>
+        <geometry><cylinder radius="${0.09*s}" length="${0.06*s}"/></geometry>
+      </collision>
+      <inertial>
+        <mass value="1.2"/>
+        <inertia ixx="0.003" iyy="0.003" izz="0.005" ixy="0" ixz="0" iyz="0"/>
+      </inertial>
+    </link>
+    <joint name="$(arg prefix)wheel_${side}_joint" type="continuous">
+      <parent link="$(arg prefix)base_link"/>
+      <child link="$(arg prefix)wheel_${side}"/>
+      <origin xyz="0 ${y*s} ${0.09*s}"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+  </xacro:macro>
+  <xacro:wheel side="left"  y="0.225"/>
+  <xacro:wheel side="right" y="-0.225"/>
+
+  <!-- passive casters, front + rear -->
+  <xacro:macro name="caster" params="pos x">
+    <link name="$(arg prefix)caster_${pos}">
+      <visual>
+        <geometry><sphere radius="${0.045*s}"/></geometry>
+        <material name="dark"/>
+      </visual>
+      <inertial>
+        <mass value="0.3"/>
+        <inertia ixx="0.0002" iyy="0.0002" izz="0.0002" ixy="0" ixz="0" iyz="0"/>
+      </inertial>
+    </link>
+    <joint name="$(arg prefix)caster_${pos}_joint" type="fixed">
+      <parent link="$(arg prefix)base_link"/>
+      <child link="$(arg prefix)caster_${pos}"/>
+      <origin xyz="${x*s} 0 ${0.045*s}"/>
+    </joint>
+  </xacro:macro>
+  <xacro:caster pos="front" x="0.20"/>
+  <xacro:caster pos="rear"  x="-0.20"/>
+
+  <!-- ================= sensor mast + EO/IR head ================= -->
+  <link name="$(arg prefix)mast">
+    <visual>
+      <geometry><cylinder radius="${0.02*s}" length="${0.22*s}"/></geometry>
+      <material name="dark"/>
+    </visual>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.002" iyy="0.002" izz="0.0001" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+  <joint name="$(arg prefix)mast_joint" type="fixed">
+    <parent link="$(arg prefix)base_link"/>
+    <child link="$(arg prefix)mast"/>
+    <origin xyz="${0.16*s} 0 ${0.32*s}"/>
+  </joint>
+
+  <link name="$(arg prefix)sensor_link">
+    <visual>
+      <geometry><box size="${0.10*s} ${0.14*s} ${0.08*s}"/></geometry>
+      <material name="sensor_glass"/>
+    </visual>
+    <inertial>
+      <mass value="0.8"/>
+      <inertia ixx="0.001" iyy="0.001" izz="0.001" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+  <joint name="$(arg prefix)sensor_joint" type="fixed">
+    <parent link="$(arg prefix)mast"/>
+    <child link="$(arg prefix)sensor_link"/>
+    <origin xyz="0 0 ${0.15*s}"/>
+  </joint>
+
+  <!-- comms antenna -->
+  <link name="$(arg prefix)antenna">
+    <visual>
+      <geometry><cylinder radius="${0.006*s}" length="${0.30*s}"/></geometry>
+      <material name="dark"/>
+    </visual>
+    <inertial>
+      <mass value="0.05"/>
+      <inertia ixx="0.0001" iyy="0.0001" izz="0.0001" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+  <joint name="$(arg prefix)antenna_joint" type="fixed">
+    <parent link="$(arg prefix)base_link"/>
+    <child link="$(arg prefix)antenna"/>
+    <origin xyz="${-0.20*s} ${-0.12*s} ${0.36*s}"/>
+  </joint>
+
+</robot>

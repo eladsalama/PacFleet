@@ -1,0 +1,11 @@
+<library path="fleet_panel">
+  <class
+    name="fleet_panel/FleetPanel"
+    type="fleet_panel::FleetPanel"
+    base_class_type="rviz_common::Panel">
+    <description>
+      Live PacFleet fleet telemetry — state, battery, speed, position per robot;
+      click a robot ring in the 3D view to focus it here.
+    </description>
+  </class>
+</library>
