@@ -20,7 +20,7 @@ Built by [Elad Salama](https://www.linkedin.com/in/eladsalama)
     <img
       alt="Pacfleet"
       src="https://github.com/user-attachments/assets/c316f01f-108a-4f13-871b-bad064aee2ca"
-      width="1200"
+      width="700"
     />
   </p>
 </details>
