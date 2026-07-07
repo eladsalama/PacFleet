@@ -14,7 +14,13 @@ Built by [Elad Salama](https://www.linkedin.com/in/eladsalama)
 
 ---
 
-<!-- VIDEO: 30s promo added here (promo/) -->
+<div align="center">
+  <a href="https://github.com/eladsalama/PacFleet/raw/main/promo/pacfleet.mp4">
+    <img src="promo/poster.png" width="90%" alt="PacFleet — watch the captioned demo"/>
+  </a>
+  <br/>
+  <sub>▶ <b>Watch the captioned walkthrough</b> — <a href="https://github.com/eladsalama/PacFleet/raw/main/promo/pacfleet.mp4"><code>promo/pacfleet.mp4</code></a></sub>
+</div>
 
 ## Project Overview
 

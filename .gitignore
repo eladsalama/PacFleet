@@ -11,6 +11,8 @@ demo_bag*/
 **/node_modules/
 promo/out/
 promo/.remotion/
+# the raw ~42 MB screen recording (the rendered pacfleet.mp4 is what's committed)
+promo/public/footage.mp4
 
 # kept local, not published
 docs/INTERVIEW_CHEATSHEET.md
