@@ -13,14 +13,17 @@
 Built by [Elad Salama](https://www.linkedin.com/in/eladsalama)
 
 ---
+<details open>
+  <summary><b>Promo</b> (click to collapse)</summary>
 
-<div align="center">
-  <a href="https://github.com/eladsalama/PacFleet/raw/main/promo/pacfleet.mp4">
-    <img src="promo/poster.png" width="90%" alt="PacFleet — watch the captioned demo"/>
-  </a>
-  <br/>
-  <sub>▶ <b>Watch the captioned walkthrough</b> — <a href="https://github.com/eladsalama/PacFleet/raw/main/promo/pacfleet.mp4"><code>promo/pacfleet.mp4</code></a></sub>
-</div>
+  <p align="center">
+    <img
+      alt="Pacfleet"
+      src="https://github.com/user-attachments/assets/c316f01f-108a-4f13-871b-bad064aee2ca"
+      width="1200"
+    />
+  </p>
+</details>
 
 ## Project Overview
 
