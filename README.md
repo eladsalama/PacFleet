@@ -17,11 +17,7 @@ Built by [Elad Salama](https://www.linkedin.com/in/eladsalama)
   <summary><b>Promo</b> (click to collapse)</summary>
 
   <p align="center">
-    <img
-      alt="Pacfleet"
-      src="https://github.com/user-attachments/assets/c316f01f-108a-4f13-871b-bad064aee2ca"
-      width="700"
-    />
+    <video src="https://github.com/user-attachments/assets/c316f01f-108a-4f13-871b-bad064aee2ca" controls muted width="700"></video>
   </p>
 </details>
 
@@ -44,6 +40,14 @@ just happens to be playing Pac-Man:
   from its motion, and the fleet **prioritizes** the swarm to run it down for bonus points.
 - **Battery runs low → return to a recharging dock**; kill a robot process → a **comms watchdog**
   declares it lost within 3 s and re-auctions its coin.
+
+## Tech Stack
+
+**Robotics/ROS 2**: ROS 2 Jazzy · rclpy/rclcpp · tf2 · actions · custom interfaces · QoS · URDF/xacro
+· robot_state_publisher · colcon (ament_python + ament_cmake) · RViz2 + a custom C++ panel  
+**AI/algorithms**: Kalman MOT · Hungarian association · A\* path planning · market-based auction ·
+PyTorch → NumPy MLP · Bresenham line-of-sight  
+**Environment**: WSL2 · Ubuntu 24.04 · Python 3.12 · C++17 · NumPy/SciPy
 
 <details open>
   <summary><b>Architecture Overview</b> (click to collapse)</summary>
@@ -126,29 +130,6 @@ pytest fleet_sim/test/ -q                   # 21 unit tests — pure logic, no R
 ```
 
 In RViz: the **Fleet** panel lists every robot's live stats — click a name to focus the camera on it.
-
-## Repo Layout
-
-```
-fleet_interfaces/   msgs + NavigateToWaypoint action (ament_cmake + rosidl)
-fleet_description/  ugv.urdf.xacro — one macro, three robots
-fleet_sim/
-  fleet_sim/        worldmap.py (maze + A*)  tracking.py  auction.py  threat_classifier.py   <- pure logic
-                    world.py  coins.py  ugv_sim.py  hub.py  ops_console.py                   <- ROS nodes
-  launch/bringup.launch.py
-  rviz/fleet_ops.rviz
-  test/             21 pytest unit tests
-fleet_panel/        custom C++ RViz panel (rviz_common::Panel, Qt/pluginlib)
-promo/              Remotion source for the demo video
-```
-
-## Tech Stack
-
-**Robotics/ROS 2**: ROS 2 Jazzy · rclpy/rclcpp · tf2 · actions · custom interfaces · QoS · URDF/xacro
-· robot_state_publisher · colcon (ament_python + ament_cmake) · RViz2 + a custom C++ panel  
-**AI/algorithms**: Kalman MOT · Hungarian association · A\* path planning · market-based auction ·
-PyTorch → NumPy MLP · Bresenham line-of-sight  
-**Environment**: WSL2 · Ubuntu 24.04 · Python 3.12 · C++17 · NumPy/SciPy
 
 ---
 
